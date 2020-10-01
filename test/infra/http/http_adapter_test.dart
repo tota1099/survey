@@ -54,7 +54,7 @@ void main() {
 
     test('Should call post with correct values', () async {
       await sut.request(url: url, method: 'post', body: {'any_key': 'any_value'});
-      
+
       verify(client.post(
         url,
         headers: {
@@ -83,6 +83,14 @@ void main() {
 
     test('Should return NULL if post returns 200 with no data', () async {
       mockResponse(200, body: '');
+
+      final response = await sut.request(url: url, method: 'post');
+
+      expect(response, null);
+    });
+
+    test('Should return NULL if post returns 204', () async {
+      mockResponse(204, body: '');
 
       final response = await sut.request(url: url, method: 'post');
 
