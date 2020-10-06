@@ -1,6 +1,6 @@
 # Survey
 
-Project to study flutter, tests and clean architecture,
+Project to study flutter, tests and clean architecture.
 
 ## Run tests
 
