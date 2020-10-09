@@ -4,6 +4,7 @@ import 'package:mockito/mockito.dart';
 
 import 'package:survey/domain/usecases/usecases.dart';
 import 'package:survey/domain/entities/entities.dart';
+import 'package:survey/domain/helpers/helpers.dart';
 
 import 'package:survey/presentation/presenters/presenters.dart';
 import 'package:survey/presentation/protocols/protocols.dart';
@@ -29,6 +30,10 @@ void main() {
   PostExpectation mockAuthenticationCall() => when(authentication.auth(any));
   
   void mockAuthentication() => mockAuthenticationCall().thenAnswer((_) async => AccountEntity(token));
+
+  void mockAuthenticationError(DomainError error) {
+    mockAuthenticationCall().thenThrow(error);
+  }
 
   setUp(() {
     validation = ValidationSpy();
@@ -124,6 +129,18 @@ void main() {
     sut.validatePassword(password);
 
     expectLater(sut.isLoadingStream, emitsInOrder([true, false]));
+
+    await sut.auth();
+  });
+
+  test('Should emit correct events on InvalidCredentialsError', () async {
+    mockAuthenticationError(DomainError.invalidCredentials);
+
+    sut.validateEmail(email);
+    sut.validatePassword(password);
+
+    expectLater(sut.isLoadingStream, emits(false));
+    sut.mainErrorStream.listen(expectAsync1((error) => expect(error, 'Credenciais inválidas')));
 
     await sut.auth();
   });
